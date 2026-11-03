@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Detalle del producto | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2 th:text="${producto.nombre}">Producto</h2>
+<p class="muted" th:text="${producto.descripcion}"></p>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<section class="panel">
+<div class="actions">
+<a class="link-button secondary" th:href="@{/catalogo/productos/{id}/editar(id=${producto.id})}">Editar producto</a>
+<form method="post" th:action="@{/catalogo/productos/{id}/estado(id=${producto.id})}">
+<button type="submit" class="secondary" th:text="${producto.activo ? 'Desactivar producto' : 'Activar producto'}"></button></form>
+<a class="link-button secondary" th:href="@{/catalogo/inventario}">Ver inventario</a></div>
+<p><strong>Categoría:</strong> <span th:text="${producto.categoria.nombre}"></span> ·
+<strong>Tipo:</strong> <span th:text="${producto.tipo}"></span> ·
+<strong>Estado:</strong> <span th:text="${producto.activo ? 'Activo' : 'Inactivo'}"></span></p>
+<p><strong>Danza:</strong> <span th:text="${producto.danza != null ? producto.danza.nombre : 'No aplica'}"></span></p>
+</section>
+<section class="panel table-wrap"><h3>Variantes del producto</h3>
+<table><thead><tr><th>ID</th><th>Talla</th><th>SKU</th><th>Precio (S/)</th><th>Stock mínimo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+<tr th:each="v : ${variantes}"><td th:text="${v.id}"></td><td th:text="${v.talla.etiqueta}"></td>
+<td th:text="${v.sku ?: '-'}"></td><td th:text="${v.precioVentaReferencial}"></td><td th:text="${v.stockMinimo}"></td>
+<td th:text="${v.activo ? 'Activa' : 'Inactiva'}"></td>
+<td><a th:href="@{/catalogo/variantes/{id}/editar(id=${v.id})}">Editar</a>
+<form class="inline-form" method="post" th:action="@{/catalogo/variantes/{id}/estado(id=${v.id})}">
+<button class="text-button" th:text="${v.activo ? 'Desactivar' : 'Activar'}"></button></form></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(variantes)}" class="muted">Aún no hay variantes. Agrega una talla debajo.</p></section>
+<section class="panel" th:if="${producto.activo}"><h3>Agregar variante</h3>
+<form method="post" th:action="@{/catalogo/productos/{id}/variantes(id=${producto.id})}" th:object="${varianteForm}">
+<div class="grid">
+<div><label for="talla">Talla</label><select id="talla" th:field="*{tallaId}">
+<option value="" th:text="${producto.tipo.toString() == 'ACCESORIO' ? 'Sin talla (Única)' : 'Seleccione una talla'}"></option>
+<option th:each="t : ${tallas}" th:value="${t.id}" th:text="${t.etiqueta}"></option></select></div>
+<div><label>SKU (opcional)</label><input th:field="*{sku}" maxlength="70" placeholder="Ej. BLU-16"></div>
+<div><label>Precio referencial (S/)</label><input th:field="*{precio}" type="number" min="0" step="0.01" required></div>
+<div><label>Stock mínimo</label><input th:field="*{stockMinimo}" type="number" min="0" step="1" required></div>
+</div><div class="actions"><button type="submit">Agregar variante</button></div></form>
+<p class="muted small">Una prenda necesita talla. Un accesorio sin talla usa automáticamente la etiqueta «Única».</p></section>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>

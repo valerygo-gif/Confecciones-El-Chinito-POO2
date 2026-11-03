@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Productos | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2>Catálogo de productos</h2>
+<div class="actions"><a class="link-button" th:href="@{/catalogo/productos/nuevo}">+ Nuevo producto</a>
+<a class="link-button secondary" th:href="@{/catalogo/maestros}">Configurar datos del catálogo</a></div>
+<section class="panel"><form method="get" th:action="@{/catalogo/productos}">
+<label for="buscar">Buscar por nombre</label><input id="buscar" name="buscar" th:value="${buscar}" placeholder="Ej. Blusa de marinera limeña">
+<div class="actions"><button type="submit">Buscar</button></div></form></section>
+<section class="panel table-wrap"><table><thead><tr><th>ID</th><th>Producto</th><th>Tipo</th><th>Categoría</th>
+<th>Danza</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+<tr th:each="p : ${productos}"><td th:text="${p.id}"></td><td th:text="${p.nombre}"></td>
+<td th:text="${p.tipo}"></td><td th:text="${p.categoria.nombre}"></td>
+<td th:text="${p.danza != null ? p.danza.nombre : '-'}"></td>
+<td th:text="${p.activo ? 'Activo' : 'Inactivo'}"></td>
+<td><a th:href="@{/catalogo/productos/{id}(id=${p.id})}">Ver producto</a></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(productos)}" class="muted">No hay productos registrados con ese filtro.</p></section>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>

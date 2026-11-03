@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Materiales | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2>Materiales e insumos</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p><p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<section class="panel"><h3>Registrar material</h3><form method="post" th:action="@{/catalogo/materiales}">
+<div class="grid"><div><label>Nombre</label><input name="nombre" maxlength="140" required placeholder="Ej. Tela popelina"></div>
+<div><label>Unidad de medida</label><input name="unidadMedida" maxlength="30" required placeholder="Ej. metro"></div>
+<div><label>Costo referencial (S/)</label><input name="costo" type="number" min="0" step="0.01" value="0" required></div>
+<div><label>Stock mínimo</label><input name="stockMinimo" type="number" min="0" step="0.001" value="0" required></div>
+</div><div class="actions"><button type="submit">Guardar material</button></div></form></section>
+<section class="panel"><h3>Registrar movimiento de material</h3>
+<form method="post" th:action="@{/catalogo/materiales/movimientos}"><div class="grid">
+<div><label>Material</label><select name="materialId" required><option value="">Seleccione material</option>
+<option th:each="m : ${materiales}" th:value="${m.id}" th:text="${m.nombre + ' (' + m.unidadMedida + ')'}"></option></select></div>
+<div><label>Ubicación</label><select name="ubicacionId" required><option value="">Seleccione ubicación</option>
+<option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Operación</label><select name="tipo" required><option value="INGRESO">Ingreso</option><option value="SALIDA">Salida</option>
+<option value="AJUSTE_POSITIVO">Ajuste positivo</option><option value="AJUSTE_NEGATIVO">Ajuste negativo</option></select></div>
+<div><label>Cantidad</label><input name="cantidad" type="number" step="0.001" min="0.001" required></div>
+<div class="wide"><label>Motivo (opcional)</label><input name="motivo" maxlength="255" placeholder="Ej. Tela recibida para producción"></div>
+</div><div class="actions"><button type="submit">Guardar movimiento</button></div></form></section>
+<details class="panel"><summary>Trasladar materiales entre ubicaciones</summary>
+<form method="post" th:action="@{/catalogo/materiales/traslados}"><div class="grid">
+<div><label>Material</label><select name="materialId" required><option value="">Seleccione</option><option th:each="m : ${materiales}" th:value="${m.id}" th:text="${m.nombre}"></option></select></div>
+<div><label>Origen</label><select name="origenId" required><option value="">Seleccione</option><option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Destino</label><select name="destinoId" required><option value="">Seleccione</option><option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Cantidad</label><input name="cantidad" type="number" min="0.001" step="0.001" required></div>
+<div><label>Motivo</label><input name="motivo" maxlength="255"></div></div>
+<div class="actions"><button type="submit">Registrar traslado</button></div></form></details>
+<section class="panel table-wrap"><h3>Stock total de materiales</h3>
+<table><thead><tr><th>ID</th><th>Material</th><th>Unidad</th><th>Físico</th><th>Mínimo</th><th>Situación</th></tr></thead>
+<tbody><tr th:each="s : ${resumen}"><td th:text="${s.materialId()}"></td><td th:text="${s.nombre()}"></td>
+<td th:text="${s.unidad()}"></td><td th:text="${s.cantidadFisica()}"></td><td th:text="${s.stockMinimo()}"></td>
+<td th:text="${s.esBajo() ? 'Stock bajo' : 'Normal'}"></td></tr></tbody></table></section>
+<section class="panel"><h3>Editar datos de materiales</h3>
+<details class="edit-box" th:each="m : ${materiales}"><summary th:text="${m.nombre}"></summary>
+<form method="post" th:action="@{/catalogo/materiales/{id}/editar(id=${m.id})}"><div class="grid">
+<div><label>Nombre</label><input name="nombre" th:value="${m.nombre}" maxlength="140" required></div>
+<div><label>Unidad</label><input name="unidadMedida" th:value="${m.unidadMedida}" maxlength="30" required></div>
+<div><label>Costo (S/)</label><input name="costo" th:value="${m.costoReferencial}" type="number" min="0" step="0.01" required></div>
+<div><label>Stock mínimo</label><input name="stockMinimo" th:value="${m.stockMinimo}" type="number" min="0" step="0.001" required></div>
+</div><div class="actions"><button type="submit">Guardar cambios</button></div></form></details></section>
+<section class="panel table-wrap"><h3>Últimos movimientos de materiales</h3>
+<table><thead><tr><th>Fecha</th><th>Material</th><th>Ubicación</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr></thead><tbody>
+<tr th:each="m : ${movimientos}"><td th:text="${m.fecha}"></td><td th:text="${m.material.nombre}"></td>
+<td th:text="${m.ubicacion.nombre}"></td><td th:text="${m.tipo}"></td><td th:text="${m.cantidad}"></td><td th:text="${m.motivo ?: '-'}"></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(movimientos)}" class="muted">No hay movimientos todavía.</p></section>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>

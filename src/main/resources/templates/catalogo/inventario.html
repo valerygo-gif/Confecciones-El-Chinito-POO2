@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Inventario de productos | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2>Inventario de prendas y accesorios</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p><p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<section class="panel"><h3>Registrar entrada o salida</h3>
+<form method="post" th:action="@{/catalogo/inventario/movimientos}"><div class="grid">
+<div><label>Variante</label><select name="varianteId" required><option value="">Seleccione producto y talla</option>
+<option th:each="v : ${variantes}" th:if="${v.activo and v.producto.activo}" th:value="${v.id}"
+ th:text="${v.producto.nombre + ' · ' + v.talla.etiqueta + ' (#' + v.id + ')'}"></option></select></div>
+<div><label>Ubicación</label><select name="ubicacionId" required><option value="">Seleccione almacén</option>
+<option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Operación</label><select name="tipo" required>
+<option value="INGRESO">Ingreso</option><option value="SALIDA">Salida</option>
+<option value="AJUSTE_POSITIVO">Ajuste positivo</option><option value="AJUSTE_NEGATIVO">Ajuste negativo</option></select></div>
+<div><label>Cantidad</label><input name="cantidad" type="number" min="1" step="1" value="1" required></div>
+<div class="wide"><label>Motivo (opcional)</label><input name="motivo" maxlength="255" placeholder="Ej. Recepción de productos terminados"></div>
+</div><div class="actions"><button type="submit">Guardar movimiento</button></div></form>
+<p class="muted small">Para registrar existencias, crea primero una variante y una ubicación. No se permiten salidas de stock reservado.</p></section>
+<details class="panel"><summary>Trasladar entre ubicaciones</summary>
+<form method="post" th:action="@{/catalogo/inventario/traslados}"><div class="grid">
+<div><label>Variante</label><select name="varianteId" required><option value="">Seleccione</option>
+<option th:each="v : ${variantes}" th:if="${v.activo and v.producto.activo}" th:value="${v.id}" th:text="${v.producto.nombre + ' · ' + v.talla.etiqueta}"></option></select></div>
+<div><label>Origen</label><select name="origenId" required><option value="">Seleccione</option><option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Destino</label><select name="destinoId" required><option value="">Seleccione</option><option th:each="u : ${ubicaciones}" th:if="${u.activa}" th:value="${u.id}" th:text="${u.nombre}"></option></select></div>
+<div><label>Cantidad</label><input name="cantidad" type="number" min="1" step="1" required></div>
+<div><label>Motivo</label><input name="motivo" maxlength="255"></div></div>
+<div class="actions"><button type="submit">Registrar traslado</button></div></form></details>
+<section class="panel table-wrap"><h3>Existencias por ubicación</h3>
+<table><thead><tr><th>Variante</th><th>Producto</th><th>Talla</th><th>SKU</th><th>Ubicación</th><th>Físico</th><th>Reservado</th><th>Disponible</th></tr></thead>
+<tbody><tr th:each="f : ${filas}"><td th:text="${f.varianteId()}"></td><td th:text="${f.producto()}"></td>
+<td th:text="${f.talla()}"></td><td th:text="${f.sku()}"></td><td th:text="${f.ubicacion()}"></td>
+<td th:text="${f.cantidadFisica()}"></td><td th:text="${f.cantidadReservada()}"></td>
+<td th:text="${f.cantidadDisponible()}"></td></tr></tbody></table>
+<p class="muted" th:if="${#lists.isEmpty(filas)}">Todavía no hay existencias. Registra un ingreso.</p></section>
+<section class="panel table-wrap"><h3>Últimos movimientos</h3>
+<table><thead><tr><th>Fecha</th><th>Variante</th><th>Ubicación</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr></thead>
+<tbody><tr th:each="m : ${movimientos}"><td th:text="${m.fecha}"></td>
+<td th:text="${m.variante.producto.nombre + ' · ' + m.variante.talla.etiqueta}"></td>
+<td th:text="${m.ubicacion.nombre}"></td><td th:text="${m.tipo}"></td><td th:text="${m.cantidad}"></td><td th:text="${m.motivo ?: '-'}"></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(movimientos)}" class="muted">No hay movimientos registrados.</p></section>
+<p class="muted small">El stock disponible se calcula con la vista MySQL vw_stock_disponible (físico menos reservado).</p>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>

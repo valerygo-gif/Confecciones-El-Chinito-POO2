@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Ubicaciones | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2>Ubicaciones y almacenes</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p><p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<section class="panel"><h3>Nueva ubicación</h3><form method="post" th:action="@{/catalogo/ubicaciones}">
+<label>Nombre</label><input name="nombre" required maxlength="100" placeholder="Ej. Almacén principal">
+<label>Descripción (opcional)</label><input name="descripcion" maxlength="255" placeholder="Ej. Taller central">
+<div class="actions"><button type="submit">Guardar ubicación</button></div></form></section>
+<section class="panel table-wrap"><h3>Ubicaciones registradas</h3><table><thead><tr><th>ID</th><th>Ubicación</th><th>Descripción</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+<tr th:each="u : ${ubicaciones}"><td th:text="${u.id}"></td><td th:text="${u.nombre}"></td><td th:text="${u.descripcion ?: '-'}"></td>
+<td th:text="${u.activa ? 'Activa' : 'Inactiva'}"></td><td><form method="post" th:action="@{/catalogo/ubicaciones/{id}/estado(id=${u.id})}">
+<button type="submit" class="secondary" th:text="${u.activa ? 'Desactivar' : 'Activar'}"></button></form></td></tr>
+</tbody></table></section>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>

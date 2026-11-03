@@ -1,0 +1,40 @@
+:root { color-scheme: light; --bg:#f6f7fb; --ink:#202b39; --muted:#69768a; --accent:#265c98; --line:#e2e7f0; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+header { background:#143958; color:#fff; padding:20px max(24px,calc((100vw - 1080px)/2)); }
+header h1 { margin:0 0 5px; font-size:22px; }
+header p { margin:0; color:#cbdced; }
+nav { display:flex; flex-wrap:wrap; gap:16px; margin-top:16px; }
+nav a { color:#fff; text-decoration:none; font-weight:600; }
+main { max-width:1080px; margin:26px auto; padding:0 20px 40px; }
+h2 { font-size:23px; margin:0 0 14px; }
+h3 { margin:0 0 12px; }
+.panel { background:white; border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:18px; box-shadow:0 2px 9px #233a5b0a; }
+.link-button, button { display:inline-block; padding:9px 13px; background:var(--accent); border:0; color:white; border-radius:7px; font:inherit; text-decoration:none; cursor:pointer; }
+.secondary { background:#eaf0f7; color:#1b466f; }
+.actions { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 18px; }
+form label { display:block; font-weight:600; margin:11px 0 5px; }
+input, select, textarea { width:100%; border:1px solid #bec9d8; border-radius:7px; padding:9px 10px; font:inherit; }
+textarea { min-height:80px; resize:vertical; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+th,td { text-align:left; padding:10px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:#f1f4f9; }
+.table-wrap { overflow-x:auto; }
+.muted { color:var(--muted); }
+.alert { padding:10px 12px; margin:0 0 16px; border-radius:8px; background:#fff1e8; color:#9a431d; }
+.ok { background:#e5f7eb; color:#14592d; }
+.small { font-size:13px; }
+footer { text-align:center; padding:22px; color:var(--muted); }
+
+/* Formularios y tablas de movimientos */
+.inline-form { display:inline-block; margin-left:8px; }
+.text-button { background:transparent; border:0; color:var(--accent); text-decoration:underline; padding:2px; }
+.wide { grid-column:1 / -1; }
+summary { cursor:pointer; font-weight:600; margin-bottom:10px; }
+.edit-box { border-bottom:1px solid var(--line); padding:12px 0; }
+.edit-box:last-child { border-bottom:0; }
+a { color:var(--accent); }
+nav a { color:white; }
+button:hover, .link-button:hover { filter:brightness(.94); }
+@media (max-width:640px) { .panel {padding:15px;} main {padding:0 12px;} th,td {font-size:13px;} }

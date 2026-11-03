@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Datos del catálogo | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
+<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
+<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
+<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<main>
+<h2>Categorías, tallas, regiones y danzas</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p><p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<div class="grid">
+<section class="panel"><h3>Categorías</h3><form method="post" th:action="@{/catalogo/maestros/categorias}">
+<label>Nueva categoría</label><input name="nombre" required maxlength="80" placeholder="Ej. Vestuario">
+<div class="actions"><button type="submit">Guardar categoría</button></div></form>
+<p th:each="c : ${categorias}" th:text="${c.nombre}"></p></section>
+<section class="panel"><h3>Tallas</h3><form method="post" th:action="@{/catalogo/maestros/tallas}">
+<label>Etiqueta</label><input name="etiqueta" required maxlength="25" placeholder="Ej. 16, S, M">
+<label>Orden visual</label><input name="orden" type="number" value="0" required>
+<div class="actions"><button type="submit">Guardar talla</button></div></form>
+<p th:each="t : ${tallas}" th:text="${t.etiqueta}"></p></section>
+<section class="panel"><h3>Regiones</h3><form method="post" th:action="@{/catalogo/maestros/regiones}">
+<label>Nombre</label><input name="nombre" required maxlength="60" placeholder="Ej. Lima">
+<div class="actions"><button type="submit">Guardar región</button></div></form>
+<p th:each="r : ${regiones}" th:text="${r.nombre}"></p></section>
+<section class="panel"><h3>Danzas</h3><form method="post" th:action="@{/catalogo/maestros/danzas}">
+<label>Nombre de la danza</label><input name="nombre" required maxlength="120" placeholder="Ej. Marinera limeña">
+<label>Región</label><select name="regionId" required><option value="">Seleccione región</option>
+<option th:each="r : ${regiones}" th:value="${r.id}" th:text="${r.nombre}"></option></select>
+<div class="actions"><button type="submit">Guardar danza</button></div></form>
+<p th:each="d : ${danzas}"><span th:text="${d.nombre}"></span>
+<span class="muted" th:if="${d.region != null}" th:text="${' (' + d.region.nombre + ')'}"></span></p></section>
+</div><p class="muted small">Las tallas se registran en un catálogo general, pero cada prenda utiliza solamente las que le corresponden.</p>
+</main><footer>Confecciones El Chinito · Gestión de catálogo e inventario</footer></body></html>
