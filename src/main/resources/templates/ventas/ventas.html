@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Ventas | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 3 · Clientes, ventas y pagos</p>
+<nav><a th:href="@{/ventas/clientes}">Clientes</a><a th:href="@{/ventas}">Ventas</a><a th:href="@{/catalogo/productos}">Catálogo</a></nav></header>
+<main>
+<h2>Ventas</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel"><form method="post" th:action="@{/ventas}">
+<label for="idPedido">Registrar venta del pedido N.º</label><input id="idPedido" name="idPedido" type="number" min="1" required>
+<div class="actions"><button type="submit">Registrar venta</button></div></form></section>
+<section class="panel table-wrap"><table><thead><tr><th>Venta</th><th>Pedido</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+<tr th:each="v : ${ventas}"><td th:text="${v.id}"></td><td th:text="${v.idPedido}"></td>
+<td th:text="${#temporals.format(v.fechaVenta,'dd/MM/yyyy HH:mm')}"></td><td th:text="${v.estado}"></td>
+<td><a th:href="@{/ventas/pedido/{id}(id=${v.idPedido})}">Cuenta y pagos</a>
+<form method="post" th:if="${v.estado.name() == 'ACTIVA'}" th:action="@{/ventas/{id}/anular(id=${v.id})}" style="display:inline"><button type="submit" class="secondary">Anular</button></form></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(ventas)}" class="muted">Aún no hay ventas registradas.</p></section>
+</main><footer>Confecciones El Chinito · Clientes, ventas y pagos</footer></body></html>

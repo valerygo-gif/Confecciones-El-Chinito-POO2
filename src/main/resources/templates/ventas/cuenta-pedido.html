@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Cuenta del pedido | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 3 · Clientes, ventas y pagos</p>
+<nav><a th:href="@{/ventas/clientes}">Clientes</a><a th:href="@{/ventas}">Ventas</a><a th:href="@{/catalogo/productos}">Catálogo</a></nav></header>
+<main>
+<h2>Cuenta del pedido <span th:text="'N.º ' + ${idPedido}"></span></h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel" th:if="${total != null}"><div class="grid">
+
+<div><strong>Total</strong><br>S/ <span th:text="${#numbers.formatDecimal(total,1,2)}"></span></div>
+<div><strong>Pagado</strong><br>S/ <span th:text="${#numbers.formatDecimal(pagado,1,2)}"></span></div>
+<div><strong>Saldo</strong><br>S/ <span th:text="${#numbers.formatDecimal(saldo,1,2)}"></span></div></div></section>
+<section class="panel" th:if="${total != null}"><h3>Registrar pago</h3>
+<form method="post" th:action="@{/ventas/pedido/{id}/pagos(id=${idPedido})}" th:object="${form}">
+<label for="monto">Monto (S/)</label><input id="monto" type="number" step="0.01" min="0.01" th:field="*{monto}" required>
+<label for="metodo">Método</label><select id="metodo" th:field="*{metodo}"><option th:each="m : ${metodos}" th:value="${m}" th:text="${m}"></option></select>
+<label for="cuentaReceptora">Cuenta receptora</label><input id="cuentaReceptora" th:field="*{cuentaReceptora}" maxlength="100">
+<label for="referenciaOperacion">Referencia de operación</label><input id="referenciaOperacion" th:field="*{referenciaOperacion}" maxlength="120">
+<label for="observaciones">Observaciones</label><input id="observaciones" th:field="*{observaciones}" maxlength="255">
+<div class="actions"><button type="submit">Registrar pago</button></div></form></section>
+<section class="panel table-wrap" th:if="${total != null}"><h3>Pagos</h3><table><thead><tr><th>Fecha</th><th>Monto</th><th>Método</th><th>Referencia</th><th>Estado</th><th></th></tr></thead><tbody>
+<tr th:each="p : ${pagos}"><td th:text="${#temporals.format(p.fechaPago,'dd/MM/yyyy HH:mm')}"></td><td th:text="${p.monto}"></td>
+<td th:text="${p.metodo}"></td><td th:text="${p.referenciaOperacion ?: '-'}"></td><td th:text="${p.estado}"></td>
+<td><form method="post" th:if="${p.estado.name() == 'CONFIRMADO'}" th:action="@{/ventas/pagos/{id}/anular(id=${p.id})}"><input type="hidden" name="idPedido" th:value="${idPedido}"><button type="submit" class="secondary">Anular</button></form></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(pagos)}" class="muted">Sin pagos registrados.</p></section>
+<section class="panel table-wrap" th:if="${total != null}"><h3>Entregas</h3>
+<form method="post" th:action="@{/ventas/pedido/{id}/entregas(id=${idPedido})}"><label for="obs">Observaciones</label><input id="obs" name="observaciones" maxlength="255">
+<div class="actions"><button type="submit">Registrar entrega</button></div></form>
+<table><thead><tr><th>Fecha</th><th>Observaciones</th></tr></thead><tbody>
+<tr th:each="e : ${entregas}"><td th:text="${#temporals.format(e.fechaEntrega,'dd/MM/yyyy HH:mm')}"></td><td th:text="${e.observaciones ?: '-'}"></td></tr></tbody></table></section>
+<div class="actions"><a class="link-button secondary" th:href="@{/ventas}">Volver a ventas</a></div>
+</main><footer>Confecciones El Chinito · Clientes, ventas y pagos</footer></body></html>
