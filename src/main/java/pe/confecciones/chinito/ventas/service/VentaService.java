@@ -67,6 +67,7 @@ public class VentaService {
         if (p.getMonto() == null || p.getMonto().signum() <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a cero.");
         }
+        exigirVentaActiva(idPedido);
         BigDecimal saldo = total(idPedido).subtract(pagado(idPedido));
         if (p.getMonto().compareTo(saldo) > 0) {
             throw new IllegalArgumentException("El monto (" + p.getMonto() + ") supera el saldo pendiente (" + saldo + ").");
@@ -83,10 +84,20 @@ public class VentaService {
 
     public Entrega registrarEntrega(Long idPedido, String observaciones) {
         pedido(idPedido);
+        exigirVentaActiva(idPedido);
         Entrega e = new Entrega();
         e.setIdPedido(idPedido);
         e.setObservaciones(observaciones);
         return entregas.save(e);
+    }
+
+    // Pagos y entregas solo se registran sobre un pedido con venta ACTIVA.
+    private void exigirVentaActiva(Long idPedido) {
+        Venta v = ventas.findByIdPedido(idPedido).orElseThrow(() ->
+                new IllegalArgumentException("El pedido " + idPedido + " no tiene venta registrada."));
+        if (v.getEstado() == Venta.Estado.ANULADA) {
+            throw new IllegalArgumentException("La venta del pedido " + idPedido + " está anulada.");
+        }
     }
 
     private PedidoResponse pedido(Long idPedido) {

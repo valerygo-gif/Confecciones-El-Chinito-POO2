@@ -8,6 +8,7 @@ import pe.confecciones.chinito.pedidos.modelo.EstadoPedido;
 import pe.confecciones.chinito.pedidos.modelo.TipoItemPedido;
 import pe.confecciones.chinito.pedidos.modelo.TipoPedido;
 import pe.confecciones.chinito.ventas.modelo.Pago;
+import pe.confecciones.chinito.ventas.modelo.Venta;
 import pe.confecciones.chinito.ventas.repository.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,6 +47,7 @@ class VentaServiceTest {
     void pagoMayorAlSaldoSeRechaza() {
         pedidoDe100();
         when(pagos.findByIdPedidoOrderByFechaPagoDesc(1L)).thenReturn(List.of());
+        ventaActiva();
         Pago f = new Pago();
         f.setMonto(new BigDecimal("150.00"));
         assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
@@ -57,5 +59,40 @@ class VentaServiceTest {
         pedidoDe100();
         when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(new pe.confecciones.chinito.ventas.modelo.Venta()));
         assertThrows(IllegalArgumentException.class, () -> servicio.registrarVenta(1L));
+    }
+
+    private void ventaActiva() {
+        when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(new Venta()));
+    }
+
+    @Test
+    void pagoYEntregaExigenVentaRegistrada() {
+        pedidoDe100();
+        when(ventas.findByIdPedido(1L)).thenReturn(Optional.empty());
+        Pago f = new Pago(); f.setMonto(new BigDecimal("10.00"));
+        assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
+        assertThrows(IllegalArgumentException.class, () -> servicio.registrarEntrega(1L, null));
+        verify(pagos, never()).save(any());
+        verify(entregas, never()).save(any());
+    }
+
+    @Test
+    void pagoYEntregaRechazadosConVentaAnulada() {
+        pedidoDe100();
+        Venta v = new Venta(); v.setEstado(Venta.Estado.ANULADA);
+        when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(v));
+        Pago f = new Pago(); f.setMonto(new BigDecimal("10.00"));
+        assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
+        assertThrows(IllegalArgumentException.class, () -> servicio.registrarEntrega(1L, null));
+    }
+
+    @Test
+    void pagoValidoConVentaActivaSeGuarda() {
+        pedidoDe100();
+        ventaActiva();
+        when(pagos.findByIdPedidoOrderByFechaPagoDesc(1L)).thenReturn(List.of());
+        Pago f = new Pago(); f.setMonto(new BigDecimal("40.00"));
+        servicio.registrarPago(1L, f);
+        verify(pagos).save(f);
     }
 }
