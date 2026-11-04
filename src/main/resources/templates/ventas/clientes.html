@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Clientes | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 3 · Clientes, ventas y pagos</p>
+<nav><a th:href="@{/ventas/clientes}">Clientes</a><a th:href="@{/ventas}">Ventas</a><a th:href="@{/catalogo/productos}">Catálogo</a></nav></header>
+<main>
+<h2>Clientes</h2>
+<div class="actions"><a class="link-button" th:href="@{/ventas/clientes/nuevo}">+ Nuevo cliente</a></div>
+<section class="panel"><form method="get" th:action="@{/ventas/clientes}">
+<label for="buscar">Buscar por nombre</label><input id="buscar" name="buscar" th:value="${buscar}">
+<div class="actions"><button type="submit">Buscar</button></div></form></section>
+<section class="panel table-wrap"><table><thead><tr><th>ID</th><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead><tbody>
+<tr th:each="c : ${clientes}"><td th:text="${c.id}"></td><td th:text="${c.nombre}"></td>
+<td th:text="${c.tipoDocumento != null ? c.tipoDocumento + ' ' + c.numeroDocumento : '-'}"></td>
+<td th:text="${c.telefono ?: '-'}"></td><td th:text="${c.email ?: '-'}"></td>
+<td><a th:href="@{/ventas/clientes/{id}/editar(id=${c.id})}">Editar</a></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(clientes)}" class="muted">No hay clientes registrados.</p></section>
+</main><footer>Confecciones El Chinito · Clientes, ventas y pagos</footer></body></html>

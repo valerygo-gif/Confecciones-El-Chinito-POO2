@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Cliente | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 3 · Clientes, ventas y pagos</p>
+<nav><a th:href="@{/ventas/clientes}">Clientes</a><a th:href="@{/ventas}">Ventas</a><a th:href="@{/catalogo/productos}">Catálogo</a></nav></header>
+<main>
+<h2 th:text="${titulo}">Nuevo cliente</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel"><form method="post" th:action="${accion}" th:object="${form}">
+<label for="nombre">Nombre</label><input id="nombre" th:field="*{nombre}" maxlength="160" required>
+<label for="tipoDocumento">Tipo de documento</label><select id="tipoDocumento" th:field="*{tipoDocumento}">
+<option value="">Sin documento</option><option th:each="t : ${tiposDocumento}" th:value="${t}" th:text="${t}"></option></select>
+<label for="numeroDocumento">Número de documento</label><input id="numeroDocumento" th:field="*{numeroDocumento}" maxlength="20">
+<label for="telefono">Teléfono</label><input id="telefono" th:field="*{telefono}" maxlength="30">
+<label for="email">Email</label><input id="email" type="email" th:field="*{email}" maxlength="140">
+<label for="direccion">Dirección</label><input id="direccion" th:field="*{direccion}" maxlength="255">
+<div class="actions"><button type="submit">Guardar cliente</button><a class="link-button secondary" th:href="@{/ventas/clientes}">Cancelar</a></div>
+</form></section>
+</main><footer>Confecciones El Chinito · Clientes, ventas y pagos</footer></body></html>
