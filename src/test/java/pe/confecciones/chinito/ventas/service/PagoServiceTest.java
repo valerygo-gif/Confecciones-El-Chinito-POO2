@@ -2,7 +2,7 @@ package pe.confecciones.chinito.ventas.service;
 
 import org.junit.jupiter.api.Test;
 import pe.confecciones.chinito.pedidos.api.PedidoConsulta;
-import pe.confecciones.chinito.pedidos.dto.PedidoDetalleResponse;
+import pe.confecciones.chinito.pedidos.dto.LineaPedidoResponse;
 import pe.confecciones.chinito.pedidos.dto.PedidoResponse;
 import pe.confecciones.chinito.pedidos.modelo.EstadoPedido;
 import pe.confecciones.chinito.pedidos.modelo.TipoItemPedido;
@@ -31,7 +31,7 @@ class PagoServiceTest {
             new VentaActivaValidator(ventas, pedidos), new PagoRegistrableValidator(), new PagoAnulableValidator());
 
     private void pedidoDe100(EstadoPedido estado) {
-        var detalle = new PedidoDetalleResponse(1L, TipoItemPedido.INDIVIDUAL, null, "Blusa", 2,
+        var detalle = new LineaPedidoResponse(1L, TipoItemPedido.INDIVIDUAL, null, "Blusa", 2,
                 new BigDecimal("50.00"), null);
         when(pedidos.buscarPedido(1L)).thenReturn(Optional.of(new PedidoResponse(1L, 7L,
                 LocalDateTime.now(), null, TipoPedido.REGULAR, estado, null, List.of(detalle))));
