@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Detalle de pedido | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','pedidos')}"></header>
+<main>
+<h2>Pedido N.º <span th:text="${pedido.id()}"></span></h2>
+<section class="panel"><div class="grid">
+<div><strong>Cliente</strong><br><span th:text="${cliente}"></span></div>
+<div><strong>Estado</strong><br><span th:text="${pedido.estado()}"></span></div>
+<div><strong>Tipo</strong><br><span th:text="${pedido.tipo()}"></span></div>
+<div><strong>Fecha del pedido</strong><br><span th:text="${#temporals.format(pedido.fechaPedido(),'dd/MM/yyyy HH:mm')}"></span></div>
+<div><strong>Entrega comprometida</strong><br><span th:text="${pedido.fechaEntregaComprometida() != null ? #temporals.format(pedido.fechaEntregaComprometida(),'dd/MM/yyyy') : '-'}"></span></div>
+</div>
+<p th:if="${pedido.notas()}"><strong>Notas:</strong> <span th:text="${pedido.notas()}"></span></p></section>
+<section class="panel table-wrap"><h3>Ítems del pedido</h3><table><thead><tr><th>Tipo</th><th>Descripción</th><th>Cantidad</th><th>Precio acordado</th><th>Subtotal</th></tr></thead><tbody>
+<tr th:each="l : ${pedido.lineas()}"><td th:text="${l.tipoItem()}"></td><td th:text="${l.descripcion()} ?: '-'"></td><td th:text="${l.cantidad()}"></td>
+<td th:text="${#numbers.formatDecimal(l.precioUnitarioAcordado(),1,2)}"></td>
+<td th:text="${#numbers.formatDecimal(l.precioUnitarioAcordado().multiply(l.cantidad()),1,2)}"></td></tr></tbody></table></section>
+<section class="panel table-wrap"><h3>Producción de este pedido</h3>
+<table th:unless="${#lists.isEmpty(ordenes)}"><thead><tr><th>Orden</th><th>Tipo</th><th>Objetivo</th><th>Estado</th><th></th></tr></thead><tbody>
+<tr th:each="o : ${ordenes}"><td th:text="${o.id()}"></td><td th:text="${o.tipo()}"></td>
+<td th:text="${o.fechaObjetivo() != null ? #temporals.format(o.fechaObjetivo(),'dd/MM/yyyy') : '-'}"></td><td th:text="${o.estado()}"></td>
+<td><a th:href="@{/produccion/{id}(id=${o.id()})}">Ver orden</a></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(ordenes)}" class="muted">Este pedido aún no tiene órdenes de producción.</p></section>
+<div class="actions"><a class="link-button secondary" th:href="@{/pedidos}">Volver a pedidos</a>
+<a class="link-button" th:if="${tieneVenta}" th:href="@{/ventas/pedido/{id}(id=${pedido.id()})}">Ver cuenta y pagos</a></div>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer></body></html>

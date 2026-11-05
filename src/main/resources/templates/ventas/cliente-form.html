@@ -6,14 +6,14 @@
 <main>
 <h2 th:text="${titulo}">Nuevo cliente</h2>
 <p class="alert" th:if="${error}" th:text="${error}"></p>
-<section class="panel"><form method="post" th:action="${accion}" th:object="${form}">
-<label for="nombre">Nombre</label><input id="nombre" th:field="*{nombre}" maxlength="160" required>
-<label for="tipoDocumento">Tipo de documento</label><select id="tipoDocumento" th:field="*{tipoDocumento}">
-<option value="">Sin documento</option><option th:each="t : ${tiposDocumento}" th:value="${t}" th:text="${t}"></option></select>
-<label for="numeroDocumento">Número de documento</label><input id="numeroDocumento" th:field="*{numeroDocumento}" maxlength="20">
-<label for="telefono">Teléfono</label><input id="telefono" th:field="*{telefono}" maxlength="30">
-<label for="email">Email</label><input id="email" type="email" th:field="*{email}" maxlength="140">
-<label for="direccion">Dirección</label><input id="direccion" th:field="*{direccion}" maxlength="255">
+<section class="panel"><form method="post" th:action="${accion}">
+<label for="nombre">Nombre</label><input id="nombre" name="nombre" th:value="${form.nombre()}" maxlength="160" required>
+<label for="tipoDocumento">Tipo de documento</label><select id="tipoDocumento" name="tipoDocumento">
+<option value="">Sin documento</option><option th:each="t : ${tiposDocumento}" th:value="${t}" th:text="${t}" th:selected="${t == form.tipoDocumento()}"></option></select>
+<label for="numeroDocumento">Número de documento</label><input id="numeroDocumento" name="numeroDocumento" th:value="${form.numeroDocumento()}" maxlength="20">
+<label for="telefono">Teléfono</label><input id="telefono" name="telefono" th:value="${form.telefono()}" maxlength="30">
+<label for="email">Email</label><input id="email" type="email" name="email" th:value="${form.email()}" maxlength="140">
+<label for="direccion">Dirección</label><input id="direccion" name="direccion" th:value="${form.direccion()}" maxlength="255">
 <div class="actions"><button type="submit">Guardar cliente</button><a class="link-button secondary" th:href="@{/ventas/clientes}">Cancelar</a></div>
 </form></section>
 </main><footer>Confecciones El Chinito · Clientes, ventas y pagos</footer></body></html>

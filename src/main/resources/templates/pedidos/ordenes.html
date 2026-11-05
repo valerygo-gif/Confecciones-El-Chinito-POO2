@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Órdenes de producción | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','produccion')}"></header>
+<main>
+<h2>Órdenes de producción</h2>
+<section class="panel"><form method="get" th:action="@{/produccion}">
+<label for="estado">Filtrar por estado</label><select id="estado" name="estado">
+<option value="">Todas</option><option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == estadoActual}"></option></select>
+<div class="actions"><button type="submit">Filtrar</button><a class="link-button secondary" th:href="@{/produccion}">Limpiar</a></div></form></section>
+<section class="panel table-wrap"><table><thead><tr><th>Orden</th><th>Tipo</th><th>Pedido</th><th>Fecha objetivo</th><th>Prioridad</th><th>Avance</th><th>Estado</th><th></th></tr></thead><tbody>
+<tr th:each="f : ${filas}"><td th:text="${f.orden().id()}"></td><td th:text="${f.orden().tipo()}"></td>
+<td><a th:if="${f.orden().idPedido()}" th:href="@{/pedidos/{id}(id=${f.orden().idPedido()})}" th:text="${f.orden().idPedido()}"></a><span th:unless="${f.orden().idPedido()}">-</span></td>
+<td th:text="${f.orden().fechaObjetivo() != null ? #temporals.format(f.orden().fechaObjetivo(),'dd/MM/yyyy') : '-'}"></td>
+<td th:text="${f.orden().prioridadManual() != null ? f.orden().prioridadManual() : '-'}"></td>
+<td th:text="${f.terminadas() + ' / ' + f.total()}"></td><td th:text="${f.orden().estado()}"></td>
+<td><a th:href="@{/produccion/{id}(id=${f.orden().id()})}">Ver detalle</a></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(filas)}" class="muted">No hay órdenes para mostrar.</p></section>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer></body></html>
