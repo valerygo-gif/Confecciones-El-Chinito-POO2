@@ -4,6 +4,8 @@
 <header th:replace="~{fragments/layout :: cabecera('pedidos','produccion')}"></header>
 <main>
 <h2>Orden de producción N.º <span th:text="${orden.id()}"></span></h2>
+<p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
 <section class="panel"><div class="grid">
 <div><strong>Tipo</strong><br><span th:text="${orden.tipo()}"></span></div>
 <div><strong>Estado</strong><br><span th:text="${orden.estado()}"></span></div>
@@ -13,13 +15,32 @@
 <div><strong>Prioridad manual</strong><br><span th:text="${orden.prioridadManual() != null ? orden.prioridadManual() : '-'}"></span></div>
 </div>
 <p th:if="${orden.indicaciones()}"><strong>Indicaciones:</strong> <span th:text="${orden.indicaciones()}"></span></p></section>
+<section class="panel"><h3>Cambiar estado</h3>
+<form th:each="e : ${transiciones}" method="post" class="inline-form" th:action="@{/produccion/{id}/estado(id=${orden.id()})}"
+ th:attr="onsubmit=${e.name() == 'CANCELADA'} ? 'return confirm(\'¿Cancelar esta orden?\')' : null">
+<input type="hidden" name="nuevo" th:value="${e}"><button type="submit" th:classappend="${e.name() == 'CANCELADA'} ? 'secondary'" th:text="'Pasar a ' + ${e}"></button></form>
+<p class="muted" th:if="${#lists.isEmpty(transiciones)}">La orden está en un estado final: no admite más cambios.</p></section>
 <section class="panel" th:each="l : ${orden.lineas()}">
 <h3 th:text="${variantes[l.idVariante()]}"></h3>
 <p>Avance: <strong th:text="${l.cantidadTerminada() + ' de ' + l.cantidadAProducir()}"></strong> unidades terminadas</p>
-<div class="table-wrap"><table th:unless="${#lists.isEmpty(trabajos[l.id()])}"><thead><tr><th>Etapa</th><th>Fecha</th><th>Trabajador</th><th>Cantidad</th><th>Tarifa</th><th>Estado</th><th>Observaciones</th></tr></thead><tbody>
+<div class="table-wrap"><table th:unless="${#lists.isEmpty(trabajos[l.id()])}"><thead><tr><th>Etapa</th><th>Fecha</th><th>Trabajador</th><th>Cantidad</th><th>Tarifa</th><th>Estado</th><th>Observaciones</th><th></th></tr></thead><tbody>
 <tr th:each="t : ${trabajos[l.id()]}"><td th:text="${t.etapa()}"></td><td th:text="${#temporals.format(t.fechaTrabajo(),'dd/MM/yyyy')}"></td>
-<td th:text="${t.idTrabajador()}"></td><td th:text="${t.cantidad()}"></td><td th:text="${#numbers.formatDecimal(t.tarifaPorUnidad(),1,2)}"></td>
-<td th:text="${t.estado()}"></td><td th:text="${t.observaciones()} ?: '-'"></td></tr></tbody></table></div>
-<p th:if="${#lists.isEmpty(trabajos[l.id()])}" class="muted">Aún no hay trabajos reportados en esta línea.</p></section>
+<td th:text="${nombresTrabajadores[t.idTrabajador()] ?: t.idTrabajador()}"></td><td th:text="${t.cantidad()}"></td><td th:text="${#numbers.formatDecimal(t.tarifaPorUnidad(),1,2)}"></td>
+<td th:text="${t.estado()}"></td><td th:text="${t.observaciones()} ?: '-'"></td>
+<td><div th:if="${t.estado().name() == 'REPORTADO'}">
+<form method="post" class="inline-form" th:action="@{/produccion/{id}/trabajos/{t}/validar(id=${orden.id()},t=${t.id()})}"><button type="submit">Validar</button></form>
+<form method="post" class="inline-form" th:action="@{/produccion/{id}/trabajos/{t}/rechazar(id=${orden.id()},t=${t.id()})}"><input type="text" name="observaciones" placeholder="Motivo (opcional)" maxlength="255" style="width:11em"><button type="submit" class="secondary">Rechazar</button></form></div></td></tr></tbody></table></div>
+<p th:if="${#lists.isEmpty(trabajos[l.id()])}" class="muted">Aún no hay trabajos reportados en esta línea.</p>
+<details th:unless="${orden.estado().name() == 'CANCELADA'}"><summary>Reportar trabajo</summary>
+<form method="post" th:action="@{/produccion/{id}/trabajos(id=${orden.id()})}">
+<input type="hidden" name="idOrdenDetalle" th:value="${l.id()}">
+<label th:for="'trab' + ${l.id()}">Trabajador</label><select th:id="'trab' + ${l.id()}" name="idTrabajador" required>
+<option value="">Seleccione</option><option th:each="w : ${trabajadores}" th:value="${w.id}" th:text="${w.nombre}"></option></select>
+<label th:for="'etapa' + ${l.id()}">Etapa</label><select th:id="'etapa' + ${l.id()}" name="etapa" required><option th:each="e : ${etapas}" th:value="${e}" th:text="${e}"></option></select>
+<label th:for="'fecha' + ${l.id()}">Fecha del trabajo</label><input th:id="'fecha' + ${l.id()}" type="date" name="fechaTrabajo" th:value="${hoy}">
+<label th:for="'cant' + ${l.id()}">Cantidad</label><input th:id="'cant' + ${l.id()}" type="number" name="cantidad" min="1" required>
+<label th:for="'tar' + ${l.id()}">Tarifa por unidad (S/)</label><input th:id="'tar' + ${l.id()}" type="number" name="tarifaPorUnidad" min="0" step="0.01" required>
+<label th:for="'obs' + ${l.id()}">Observaciones</label><input th:id="'obs' + ${l.id()}" name="observaciones" maxlength="255">
+<div class="actions"><button type="submit">Reportar trabajo</button></div></form></details></section>
 <div class="actions"><a class="link-button secondary" th:href="@{/produccion}">Volver a órdenes</a></div>
 </main><footer>Confecciones El Chinito · Pedidos y producción</footer></body></html>

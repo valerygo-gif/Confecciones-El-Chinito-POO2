@@ -8,7 +8,9 @@ import pe.confecciones.chinito.ventas.modelo.Cliente;
 import pe.confecciones.chinito.ventas.repository.ClienteRepository;
 import pe.confecciones.chinito.ventas.service.excepcion.ClienteNoEncontradoException;
 import pe.confecciones.chinito.ventas.service.validador.ClienteDocumentoValidator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -54,5 +56,12 @@ public class ClienteServiceImpl implements ClienteService, ClienteConsulta {
     @Override
     public Optional<String> nombreCliente(Long idCliente) {
         return clientes.findById(idCliente).map(Cliente::getNombre);
+    }
+
+    @Override
+    public Map<Long, String> listarNombres() {
+        Map<Long, String> nombres = new LinkedHashMap<>();
+        clientes.findAllByOrderByNombreAsc().forEach(c -> nombres.put(c.getId(), c.getNombre()));
+        return nombres;
     }
 }

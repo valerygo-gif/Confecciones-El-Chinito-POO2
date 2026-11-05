@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Nuevo pedido | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','pedidos')}"></header>
+<main>
+<h2>Nuevo pedido</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<form method="post" th:action="@{/pedidos}">
+<section class="panel">
+<label for="idCliente">Cliente</label><select id="idCliente" name="idCliente" required>
+<option value="">Seleccione un cliente</option>
+<option th:each="c : ${listaClientes}" th:value="${c.key}" th:text="${c.value}" th:selected="${c.key == idClienteElegido}"></option></select>
+<p class="muted small" th:if="${#maps.isEmpty(listaClientes)}">No hay clientes. <a th:href="@{/ventas/clientes/nuevo}">Registrar un cliente</a></p>
+<label for="tipo">Tipo de pedido</label><select id="tipo" name="tipo">
+<option th:each="t : ${tiposPedido}" th:value="${t}" th:text="${t}"></option></select>
+<label for="fechaEntrega">Entrega comprometida</label><input id="fechaEntrega" type="date" name="fechaEntrega">
+<label for="notas">Notas</label><textarea id="notas" name="notas" rows="2"></textarea>
+</section>
+<section class="panel table-wrap">
+<h3>Detalle</h3>
+<table><thead><tr><th>Tipo de ítem</th><th>N.º conjunto</th><th>Descripción</th><th>Cantidad</th><th>Precio acordado</th><th></th></tr></thead>
+<tbody id="lineas">
+<tr class="linea">
+<td><select name="tipoItem"><option th:each="t : ${tiposItem}" th:value="${t}" th:text="${t}"></option></select></td>
+<td><input name="idConjunto" type="number" min="1" placeholder="Solo CONJUNTO"></td>
+<td><input name="descripcion" maxlength="255" required></td>
+<td><input name="cantidad" type="number" min="1" value="1" required></td>
+<td><input name="precio" type="number" min="0" step="0.01" required></td>
+<td><button type="button" class="text-button quitar">Quitar</button></td></tr>
+</tbody></table>
+<div class="actions"><button type="button" class="secondary" id="agregar">Agregar detalle</button></div>
+</section>
+<div class="actions"><button type="submit">Guardar pedido</button><a class="link-button secondary" th:href="@{/pedidos}">Cancelar</a></div>
+</form>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer>
+<script>
+(function () {
+  var cuerpo = document.getElementById('lineas');
+  document.getElementById('agregar').addEventListener('click', function () {
+    var copia = cuerpo.querySelector('tr.linea').cloneNode(true);
+    copia.querySelectorAll('input').forEach(function (i) { i.value = i.name === 'cantidad' ? '1' : ''; });
+    copia.querySelector('select').selectedIndex = 0;
+    cuerpo.appendChild(copia);
+  });
+  cuerpo.addEventListener('click', function (e) {
+    if (!e.target.classList.contains('quitar')) return;
+    if (cuerpo.querySelectorAll('tr.linea').length > 1) e.target.closest('tr').remove();
+  });
+})();
+</script></body></html>

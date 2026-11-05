@@ -4,6 +4,7 @@
 <header th:replace="~{fragments/layout :: cabecera('pedidos','pedidos')}"></header>
 <main>
 <h2>Pedidos</h2>
+<div class="actions"><a class="link-button" th:href="@{/pedidos/nuevo}">Nuevo pedido</a></div>
 <section class="panel"><form method="get" th:action="@{/pedidos}">
 <label for="estado">Filtrar por estado</label><select id="estado" name="estado">
 <option value="">Todos</option><option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == estadoActual}"></option></select>

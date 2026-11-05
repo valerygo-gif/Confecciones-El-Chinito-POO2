@@ -4,6 +4,8 @@
 <header th:replace="~{fragments/layout :: cabecera('pedidos','pedidos')}"></header>
 <main>
 <h2>Pedido N.º <span th:text="${pedido.id()}"></span></h2>
+<p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
 <section class="panel"><div class="grid">
 <div><strong>Cliente</strong><br><span th:text="${cliente}"></span></div>
 <div><strong>Estado</strong><br><span th:text="${pedido.estado()}"></span></div>
@@ -12,11 +14,17 @@
 <div><strong>Entrega comprometida</strong><br><span th:text="${pedido.fechaEntregaComprometida() != null ? #temporals.format(pedido.fechaEntregaComprometida(),'dd/MM/yyyy') : '-'}"></span></div>
 </div>
 <p th:if="${pedido.notas()}"><strong>Notas:</strong> <span th:text="${pedido.notas()}"></span></p></section>
+<section class="panel"><h3>Cambiar estado</h3>
+<form th:each="e : ${transiciones}" method="post" class="inline-form" th:action="@{/pedidos/{id}/estado(id=${pedido.id()})}"
+ th:attr="onsubmit=${e.name() == 'CANCELADO'} ? 'return confirm(\'¿Cancelar este pedido?\')' : null">
+<input type="hidden" name="nuevo" th:value="${e}"><button type="submit" th:classappend="${e.name() == 'CANCELADO'} ? 'secondary'" th:text="'Pasar a ' + ${e}"></button></form>
+<p class="muted" th:if="${#lists.isEmpty(transiciones)}">El pedido está en un estado final: no admite más cambios.</p></section>
 <section class="panel table-wrap"><h3>Ítems del pedido</h3><table><thead><tr><th>Tipo</th><th>Descripción</th><th>Cantidad</th><th>Precio acordado</th><th>Subtotal</th></tr></thead><tbody>
 <tr th:each="l : ${pedido.lineas()}"><td th:text="${l.tipoItem()}"></td><td th:text="${l.descripcion()} ?: '-'"></td><td th:text="${l.cantidad()}"></td>
 <td th:text="${#numbers.formatDecimal(l.precioUnitarioAcordado(),1,2)}"></td>
 <td th:text="${#numbers.formatDecimal(l.precioUnitarioAcordado().multiply(l.cantidad()),1,2)}"></td></tr></tbody></table></section>
 <section class="panel table-wrap"><h3>Producción de este pedido</h3>
+<div class="actions"><a class="link-button" th:href="@{/produccion/nueva(idPedido=${pedido.id()})}">Nueva orden de producción</a></div>
 <table th:unless="${#lists.isEmpty(ordenes)}"><thead><tr><th>Orden</th><th>Tipo</th><th>Objetivo</th><th>Estado</th><th></th></tr></thead><tbody>
 <tr th:each="o : ${ordenes}"><td th:text="${o.id()}"></td><td th:text="${o.tipo()}"></td>
 <td th:text="${o.fechaObjetivo() != null ? #temporals.format(o.fechaObjetivo(),'dd/MM/yyyy') : '-'}"></td><td th:text="${o.estado()}"></td>

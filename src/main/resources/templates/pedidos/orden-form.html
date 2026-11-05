@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Nueva orden | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','produccion')}"></header>
+<main>
+<h2>Nueva orden de producción</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<form method="post" th:action="@{/produccion}">
+<section class="panel">
+<label for="tipo">Tipo de orden</label><select id="tipo" name="tipo">
+<option th:each="t : ${tipos}" th:value="${t}" th:text="${t == T(pe.confecciones.chinito.pedidos.modelo.TipoOrden).PEDIDO ? 'PEDIDO (para un pedido de cliente)' : 'REPOSICION (para reponer stock)'}" th:selected="${t == tipoSel}"></option></select>
+<label for="idPedido">Pedido</label><select id="idPedido" name="idPedido">
+<option value="">Seleccione un pedido</option>
+<option th:each="p : ${listaPedidos}" th:value="${p.id()}" th:selected="${p.id() == idPedidoSel}"
+ th:text="'N.º ' + ${p.id()} + ' · ' + ${p.estado()} + ' · ' + ${p.tipo()}"></option></select>
+<label for="fechaObjetivo">Fecha objetivo</label><input id="fechaObjetivo" type="date" name="fechaObjetivo" th:value="${fechaObjetivo}" required>
+<label for="prioridadManual">Prioridad (1 = más urgente, 5 = menos)</label><select id="prioridadManual" name="prioridadManual">
+<option value="">Sin prioridad manual</option><option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:text="${n}" th:selected="${n == prioridadSel}"></option></select>
+<label for="indicaciones">Indicaciones</label><textarea id="indicaciones" name="indicaciones" rows="2" th:text="${indicaciones}"></textarea>
+</section>
+<section class="panel table-wrap">
+<h3>Qué se va a producir</h3>
+<table><thead><tr><th>Variante</th><th>Cantidad a producir</th><th></th></tr></thead>
+<tbody id="lineas">
+<tr class="linea" th:each="f : ${filas}">
+<td><select name="idVariante" required><option value="">Seleccione una variante</option>
+<option th:each="v : ${listaVariantes}" th:value="${v.id()}" th:selected="${v.id() == f.idVariante()}"
+ th:text="${v.producto()} + ' ' + ${v.talla()} + ' (' + ${v.sku()} + ') · disp. ' + ${v.stockDisponible()}"></option></select></td>
+<td><input name="cantidad" type="number" min="1" th:value="${f.cantidad()}" required></td>
+<td><button type="button" class="text-button quitar">Quitar</button></td></tr>
+</tbody></table>
+<div class="actions"><button type="button" class="secondary" id="agregar">Agregar línea</button></div>
+</section>
+<div class="actions"><button type="submit">Crear orden</button><a class="link-button secondary" th:href="@{/produccion}">Cancelar</a></div>
+</form>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer>
+<script>
+(function () {
+  var cuerpo = document.getElementById('lineas');
+  var tipo = document.getElementById('tipo'), pedido = document.getElementById('idPedido');
+  function alternarPedido() { var rep = tipo.value === 'REPOSICION'; pedido.disabled = rep; pedido.required = !rep; if (rep) pedido.value = ''; }
+  tipo.addEventListener('change', alternarPedido); alternarPedido();
+  document.getElementById('agregar').addEventListener('click', function () {
+    var copia = cuerpo.querySelector('tr.linea').cloneNode(true);
+    copia.querySelector('select').selectedIndex = 0; copia.querySelector('input').value = '';
+    cuerpo.appendChild(copia);
+  });
+  cuerpo.addEventListener('click', function (e) {
+    if (e.target.classList.contains('quitar') && cuerpo.querySelectorAll('tr.linea').length > 1) e.target.closest('tr').remove();
+  });
+})();
+</script></body></html>
