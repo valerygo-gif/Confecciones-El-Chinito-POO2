@@ -1,10 +1,7 @@
 <!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Materiales | El Chinito</title>
 <link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
-<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 1 · Catálogo e inventario</p>
-<nav><a th:href="@{/catalogo/productos}">Productos</a><a th:href="@{/catalogo/inventario}">Inventario</a>
-<a th:href="@{/catalogo/materiales}">Materiales</a><a th:href="@{/catalogo/maestros}">Datos del catálogo</a>
-<a th:href="@{/catalogo/ubicaciones}">Ubicaciones</a></nav></header>
+<header th:replace="~{fragments/layout :: cabecera('catalogo','materiales')}"></header>
 <main>
 <h2>Materiales e insumos</h2>
 <p class="alert" th:if="${error}" th:text="${error}"></p><p class="alert ok" th:if="${mensaje}" th:text="${mensaje}"></p>

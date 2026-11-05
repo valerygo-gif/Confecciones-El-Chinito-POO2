@@ -1,8 +1,7 @@
 <!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Cuenta del pedido | El Chinito</title>
 <link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
-<header><h1>Confecciones El Chinito</h1><p>POO II · Módulo 3 · Clientes, ventas y pagos</p>
-<nav><a th:href="@{/ventas/clientes}">Clientes</a><a th:href="@{/ventas}">Ventas</a><a th:href="@{/catalogo/productos}">Catálogo</a></nav></header>
+<header th:replace="~{fragments/layout :: cabecera('ventas','ventas')}"></header>
 <main>
 <h2>Cuenta del pedido <span th:text="'N.º ' + ${idPedido}"></span></h2>
 <p class="alert" th:if="${error}" th:text="${error}"></p>
