@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Proveedor | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','proveedores')}"></header>
+<main>
+<h2 th:text="${titulo}">Nuevo proveedor</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel"><form method="post" th:action="${accion}">
+<label for="nombre">Nombre</label><input id="nombre" name="nombre" th:value="${form.nombre()}" maxlength="160" required>
+<label for="ruc">RUC (11 dígitos)</label><input id="ruc" name="ruc" th:value="${form.ruc()}" maxlength="11" pattern="[0-9]{11}">
+<label for="telefono">Teléfono</label><input id="telefono" name="telefono" th:value="${form.telefono()}" maxlength="30">
+<label for="contacto">Contacto</label><input id="contacto" name="contacto" th:value="${form.contacto()}" maxlength="120">
+<label for="observaciones">Observaciones</label><textarea id="observaciones" name="observaciones" th:text="${form.observaciones()}"></textarea>
+<div class="actions"><button type="submit">Guardar proveedor</button><a class="link-button secondary" th:href="@{/compras/proveedores}">Cancelar</a></div>
+</form></section>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>

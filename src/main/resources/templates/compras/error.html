@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Error | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','compras')}"></header>
+<main>
+<h2>No se pudo completar la operación</h2>
+<p class="alert" th:text="${mensaje}"></p>
+<div class="actions"><a class="link-button secondary" th:href="@{/compras}">Volver a compras</a></div>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>
