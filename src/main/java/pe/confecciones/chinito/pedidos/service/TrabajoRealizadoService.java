@@ -3,6 +3,7 @@ package pe.confecciones.chinito.pedidos.service;
 import pe.confecciones.chinito.pedidos.dto.*;
 import pe.confecciones.chinito.pedidos.modelo.*;
 import pe.confecciones.chinito.pedidos.repository.LineaOrdenRepository;
+import pe.confecciones.chinito.pedidos.repository.TrabajadorRepository;
 import pe.confecciones.chinito.pedidos.repository.TrabajoRealizadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +16,13 @@ import java.util.List;
 public class TrabajoRealizadoService {
     private final TrabajoRealizadoRepository trabajos;
     private final LineaOrdenRepository lineasOrden;
+    private final TrabajadorRepository trabajadores;
 
-    public TrabajoRealizadoService(TrabajoRealizadoRepository trabajos, LineaOrdenRepository lineasOrden) {
+    public TrabajoRealizadoService(TrabajoRealizadoRepository trabajos, LineaOrdenRepository lineasOrden,
+                                   TrabajadorRepository trabajadores) {
         this.trabajos = trabajos;
         this.lineasOrden = lineasOrden;
+        this.trabajadores = trabajadores;
     }
 
     @Transactional
@@ -32,7 +36,19 @@ public class TrabajoRealizadoService {
         if (r.tarifaPorUnidad() == null || r.tarifaPorUnidad().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("La tarifa por unidad no puede ser negativa.");
         }
-        buscarLineaOrden(r.idOrdenDetalle());
+        Trabajador trabajador = trabajadores.findById(r.idTrabajador())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Trabajador", r.idTrabajador()));
+        if (!trabajador.isActivo()) {
+            throw new IllegalArgumentException("El trabajador " + trabajador.getNombre() + " está inactivo.");
+        }
+        LineaOrden linea = buscarLineaOrden(r.idOrdenDetalle());
+        long yaReportado = trabajos.unidadesReportadas(r.idOrdenDetalle(), r.etapa(), EstadoTrabajo.RECHAZADO);
+        long disponible = linea.getCantidadAProducir() - yaReportado;
+        if (r.cantidad() > disponible) {
+            throw new IllegalArgumentException("La cantidad supera lo pendiente en la etapa " + r.etapa()
+                    + ": la línea pide " + linea.getCantidadAProducir() + ", ya se reportaron " + yaReportado
+                    + " y quedan " + Math.max(disponible, 0) + ".");
+        }
         TrabajoRealizado t = new TrabajoRealizado();
         t.setIdOrdenDetalle(r.idOrdenDetalle());
         t.setIdTrabajador(r.idTrabajador());
@@ -42,6 +58,18 @@ public class TrabajoRealizadoService {
         t.setTarifaPorUnidad(r.tarifaPorUnidad());
         t.setObservaciones(r.observaciones());
         return TrabajoResponse.desde(trabajos.save(t));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Trabajador> trabajadoresActivos() {
+        return trabajadores.findByActivoTrueOrderByNombreAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.Map<Long, String> nombresTrabajadores() {
+        java.util.Map<Long, String> nombres = new java.util.HashMap<>();
+        trabajadores.findAll().forEach(t -> nombres.put(t.getId(), t.getNombre()));
+        return nombres;
     }
 
     @Transactional(readOnly = true)
