@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Detalle de orden | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','produccion')}"></header>
+<main>
+<h2>Orden de producción N.º <span th:text="${orden.id()}"></span></h2>
+<section class="panel"><div class="grid">
+<div><strong>Tipo</strong><br><span th:text="${orden.tipo()}"></span></div>
+<div><strong>Estado</strong><br><span th:text="${orden.estado()}"></span></div>
+<div><strong>Pedido</strong><br><a th:if="${orden.idPedido()}" th:href="@{/pedidos/{id}(id=${orden.idPedido()})}" th:text="${orden.idPedido()}"></a><span th:unless="${orden.idPedido()}">-</span></div>
+<div><strong>Creada</strong><br><span th:text="${#temporals.format(orden.fechaCreacion(),'dd/MM/yyyy HH:mm')}"></span></div>
+<div><strong>Fecha objetivo</strong><br><span th:text="${orden.fechaObjetivo() != null ? #temporals.format(orden.fechaObjetivo(),'dd/MM/yyyy') : '-'}"></span></div>
+<div><strong>Prioridad manual</strong><br><span th:text="${orden.prioridadManual() != null ? orden.prioridadManual() : '-'}"></span></div>
+</div>
+<p th:if="${orden.indicaciones()}"><strong>Indicaciones:</strong> <span th:text="${orden.indicaciones()}"></span></p></section>
+<section class="panel" th:each="l : ${orden.lineas()}">
+<h3 th:text="${variantes[l.idVariante()]}"></h3>
+<p>Avance: <strong th:text="${l.cantidadTerminada() + ' de ' + l.cantidadAProducir()}"></strong> unidades terminadas</p>
+<div class="table-wrap"><table th:unless="${#lists.isEmpty(trabajos[l.id()])}"><thead><tr><th>Etapa</th><th>Fecha</th><th>Trabajador</th><th>Cantidad</th><th>Tarifa</th><th>Estado</th><th>Observaciones</th></tr></thead><tbody>
+<tr th:each="t : ${trabajos[l.id()]}"><td th:text="${t.etapa()}"></td><td th:text="${#temporals.format(t.fechaTrabajo(),'dd/MM/yyyy')}"></td>
+<td th:text="${t.idTrabajador()}"></td><td th:text="${t.cantidad()}"></td><td th:text="${#numbers.formatDecimal(t.tarifaPorUnidad(),1,2)}"></td>
+<td th:text="${t.estado()}"></td><td th:text="${t.observaciones()} ?: '-'"></td></tr></tbody></table></div>
+<p th:if="${#lists.isEmpty(trabajos[l.id()])}" class="muted">Aún no hay trabajos reportados en esta línea.</p></section>
+<div class="actions"><a class="link-button secondary" th:href="@{/produccion}">Volver a órdenes</a></div>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer></body></html>
