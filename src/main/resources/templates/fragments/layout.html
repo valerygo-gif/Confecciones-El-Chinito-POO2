@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- Cabecera compartida por todos los módulos: barra de módulos + submenú del módulo actual.
+     Uso en cada vista: <header th:replace="~{fragments/layout :: cabecera('compras','proveedores')}"></header> -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="topbar" th:fragment="cabecera(modulo, seccion)">
+  <div class="topbar-main">
+    <a class="brand" th:href="@{/}">Confecciones El Chinito</a>
+    <nav class="modulos" aria-label="Módulos">
+      <a th:href="@{/catalogo/productos}" th:classappend="${modulo == 'catalogo'} ? 'activo'" th:attr="aria-current=${modulo == 'catalogo'} ? 'page'">Catálogo e inventario</a>
+      <a th:href="@{/pedidos}" th:classappend="${modulo == 'pedidos'} ? 'activo'" th:attr="aria-current=${modulo == 'pedidos'} ? 'page'">Pedidos y producción</a>
+      <a th:href="@{/ventas}" th:classappend="${modulo == 'ventas'} ? 'activo'" th:attr="aria-current=${modulo == 'ventas'} ? 'page'">Clientes y ventas</a>
+      <a th:href="@{/compras}" th:classappend="${modulo == 'compras'} ? 'activo'" th:attr="aria-current=${modulo == 'compras'} ? 'page'">Compras y costos</a>
+    </nav>
+  </div>
+  <nav class="submenu" th:if="${modulo == 'catalogo'}" aria-label="Catálogo e inventario">
+    <a th:href="@{/catalogo/productos}" th:classappend="${seccion == 'productos'} ? 'activo'" th:attr="aria-current=${seccion == 'productos'} ? 'page'">Productos</a>
+    <a th:href="@{/catalogo/inventario}" th:classappend="${seccion == 'inventario'} ? 'activo'" th:attr="aria-current=${seccion == 'inventario'} ? 'page'">Inventario</a>
+    <a th:href="@{/catalogo/materiales}" th:classappend="${seccion == 'materiales'} ? 'activo'" th:attr="aria-current=${seccion == 'materiales'} ? 'page'">Materiales</a>
+    <a th:href="@{/catalogo/maestros}" th:classappend="${seccion == 'maestros'} ? 'activo'" th:attr="aria-current=${seccion == 'maestros'} ? 'page'">Datos del catálogo</a>
+    <a th:href="@{/catalogo/ubicaciones}" th:classappend="${seccion == 'ubicaciones'} ? 'activo'" th:attr="aria-current=${seccion == 'ubicaciones'} ? 'page'">Ubicaciones</a>
+  </nav>
+  <nav class="submenu" th:if="${modulo == 'pedidos'}" aria-label="Pedidos y producción">
+    <a th:href="@{/pedidos}" th:classappend="${seccion == 'pedidos'} ? 'activo'" th:attr="aria-current=${seccion == 'pedidos'} ? 'page'">Pedidos</a>
+    <a th:href="@{/produccion}" th:classappend="${seccion == 'produccion'} ? 'activo'" th:attr="aria-current=${seccion == 'produccion'} ? 'page'">Órdenes de producción</a>
+  </nav>
+  <nav class="submenu" th:if="${modulo == 'ventas'}" aria-label="Clientes y ventas">
+    <a th:href="@{/ventas}" th:classappend="${seccion == 'ventas'} ? 'activo'" th:attr="aria-current=${seccion == 'ventas'} ? 'page'">Ventas</a>
+    <a th:href="@{/ventas/clientes}" th:classappend="${seccion == 'clientes'} ? 'activo'" th:attr="aria-current=${seccion == 'clientes'} ? 'page'">Clientes</a>
+  </nav>
+  <nav class="submenu" th:if="${modulo == 'compras'}" aria-label="Compras y costos">
+    <a th:href="@{/compras}" th:classappend="${seccion == 'compras'} ? 'activo'" th:attr="aria-current=${seccion == 'compras'} ? 'page'">Compras</a>
+    <a th:href="@{/compras/proveedores}" th:classappend="${seccion == 'proveedores'} ? 'activo'" th:attr="aria-current=${seccion == 'proveedores'} ? 'page'">Proveedores</a>
+    <a th:href="@{/compras/reportes}" th:classappend="${seccion == 'reportes'} ? 'activo'" th:attr="aria-current=${seccion == 'reportes'} ? 'page'">Costos y reportes</a>
+  </nav>
+</header>
+</body>
+</html>
