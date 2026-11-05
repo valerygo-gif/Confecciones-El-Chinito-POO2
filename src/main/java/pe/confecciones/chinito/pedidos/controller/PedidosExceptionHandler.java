@@ -1,6 +1,7 @@
 package pe.confecciones.chinito.pedidos.controller;
 
-import pe.confecciones.chinito.pedidos.service.excepcion.*;
+import pe.confecciones.chinito.pedidos.service.RecursoNoEncontradoException;
+import pe.confecciones.chinito.pedidos.service.TransicionInvalidaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,14 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackages = "pe.confecciones.chinito.pedidos.controller")
 public class PedidosExceptionHandler {
 
-    @ExceptionHandler({PedidoNoEncontradoException.class, OrdenProduccionNoEncontradaException.class,
-            TrabajoNoEncontradoException.class})
-    public ProblemDetail noEncontrado(RuntimeException e) {
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ProblemDetail noEncontrado(RecursoNoEncontradoException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
-    @ExceptionHandler(TransicionEstadoInvalidaException.class)
-    public ProblemDetail conflicto(TransicionEstadoInvalidaException e) {
+    @ExceptionHandler(TransicionInvalidaException.class)
+    public ProblemDetail conflicto(TransicionInvalidaException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 

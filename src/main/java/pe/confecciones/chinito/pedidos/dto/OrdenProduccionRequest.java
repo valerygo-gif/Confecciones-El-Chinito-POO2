@@ -5,5 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record OrdenProduccionRequest(TipoOrden tipo, Long idPedido, LocalDate fechaObjetivo,
-                                     Integer prioridadManual, String indicaciones,
-                                     List<OrdenDetalleRequest> detalles) { }
+                                     Integer prioridadManual, String indicaciones, List<Linea> lineas) {
+
+    public record Linea(Long idVariante, Long idPedidoComponente, Integer cantidadAProducir) { }
+}

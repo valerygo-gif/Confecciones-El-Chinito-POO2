@@ -1,8 +1,7 @@
 package pe.confecciones.chinito.pedidos.controller;
 
-import pe.confecciones.chinito.pedidos.dto.PedidoRequest;
-import pe.confecciones.chinito.pedidos.dto.PedidoResponse;
-import pe.confecciones.chinito.pedidos.modelo.EstadoPedido;
+import pe.confecciones.chinito.pedidos.dto.*;
+import pe.confecciones.chinito.pedidos.modelo.*;
 import pe.confecciones.chinito.pedidos.service.PedidoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,9 @@ public class PedidoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PedidoResponse registrar(@RequestBody PedidoRequest request) { return servicio.registrar(request); }
+    public PedidoResponse registrar(@RequestBody PedidoRequest request) {
+        return servicio.registrar(request);
+    }
 
     @GetMapping("/{id}")
     public PedidoResponse obtener(@PathVariable Long id) { return servicio.obtener(id); }
