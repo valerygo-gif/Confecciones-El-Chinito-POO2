@@ -3,7 +3,7 @@ package pe.confecciones.chinito.ventas.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.confecciones.chinito.pedidos.api.PedidoConsulta;
-import pe.confecciones.chinito.pedidos.dto.PedidoDetalleResponse;
+import pe.confecciones.chinito.pedidos.dto.LineaPedidoResponse;
 import pe.confecciones.chinito.ventas.dto.PagoRequest;
 import pe.confecciones.chinito.ventas.modelo.EstadoPago;
 import pe.confecciones.chinito.ventas.modelo.Pago;
@@ -41,7 +41,7 @@ public class PagoServiceImpl implements PagoService {
         BigDecimal total = BigDecimal.ZERO;
         var pedido = pedidos.buscarPedido(idPedido)
                 .orElseThrow(() -> new ReglaVentaException("El pedido " + idPedido + " no existe."));
-        for (PedidoDetalleResponse d : pedido.detalles()) {
+        for (LineaPedidoResponse d : pedido.lineas()) {
             total = total.add(d.precioUnitarioAcordado().multiply(BigDecimal.valueOf(d.cantidad())));
         }
         return total;

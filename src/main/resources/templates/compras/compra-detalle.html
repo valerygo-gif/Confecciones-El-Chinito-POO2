@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Detalle de compra | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','compras')}"></header>
+<main>
+<h2>Compra N.º <span th:text="${compra.id()}"></span></h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel"><p><strong>Proveedor:</strong> <span th:text="${compra.proveedor()}"></span></p>
+<p><strong>Documento:</strong> <span th:text="${compra.nroDocumento()} ?: '-'"></span></p>
+<p><strong>Fecha:</strong> <span th:text="${#temporals.format(compra.fecha(),'dd/MM/yyyy HH:mm')}"></span></p>
+<p><strong>Estado:</strong> <span th:text="${compra.estado()}"></span></p></section>
+<section class="panel table-wrap"><table><thead><tr><th>Tipo</th><th>Ítem</th><th>Cantidad</th><th>Precio unit.</th><th>Subtotal</th></tr></thead><tbody>
+<tr th:each="l : ${compra.lineas()}"><td th:text="${l.tipo()}"></td><td th:text="${l.descripcion()}"></td><td th:text="${l.cantidad()}"></td>
+<td th:text="${#numbers.formatDecimal(l.precioUnitario(),1,2)}"></td><td th:text="${#numbers.formatDecimal(l.subtotal(),1,2)}"></td></tr></tbody>
+<tfoot><tr><th colspan="4">Total</th><th th:text="${#numbers.formatDecimal(compra.total(),1,2)}"></th></tr></tfoot></table></section>
+<section class="panel" th:if="${compra.estado().name() == 'REGISTRADA'}">
+<form method="post" th:action="@{/compras/{id}/recibir(id=${compra.id()})}">
+<label for="idUbicacion">Ubicación donde ingresa la mercadería</label><select id="idUbicacion" name="idUbicacion" required>
+<option value="">Selecciona una ubicación</option><option th:each="u : ${ubicaciones}" th:value="${u.key}" th:text="${u.value}"></option></select>
+<div class="actions"><button type="submit">Recibir compra e ingresar al inventario</button></div></form>
+<form method="post" th:action="@{/compras/{id}/anular(id=${compra.id()})}"><button type="submit" class="secondary">Anular compra</button></form></section>
+<div class="actions"><a class="link-button secondary" th:href="@{/compras}">Volver a compras</a></div>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>
