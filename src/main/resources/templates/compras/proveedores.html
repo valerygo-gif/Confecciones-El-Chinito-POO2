@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Proveedores | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','proveedores')}"></header>
+<main>
+<h2>Proveedores</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<section class="panel"><form method="get" th:action="@{/compras/proveedores}">
+<label for="buscar">Buscar por nombre</label><input id="buscar" name="buscar" th:value="${buscar}">
+<div class="actions"><button type="submit">Buscar</button><a class="link-button secondary" th:href="@{/compras/proveedores/nuevo}">Nuevo proveedor</a></div></form></section>
+<section class="panel table-wrap"><table><thead><tr><th>Nombre</th><th>RUC</th><th>Teléfono</th><th>Contacto</th><th>Acciones</th></tr></thead><tbody>
+<tr th:each="p : ${proveedores}"><td th:text="${p.nombre()}"></td><td th:text="${p.ruc()} ?: '-'"></td><td th:text="${p.telefono()} ?: '-'"></td><td th:text="${p.contacto()} ?: '-'"></td>
+<td><a th:href="@{/compras/proveedores/{id}/editar(id=${p.id()})}">Editar</a>
+<form class="inline-form" method="post" th:if="${p.eliminable()}" th:action="@{/compras/proveedores/{id}/eliminar(id=${p.id()})}"><button type="submit" class="secondary">Eliminar</button></form></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(proveedores)}" class="muted">Aún no hay proveedores registrados.</p></section>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>

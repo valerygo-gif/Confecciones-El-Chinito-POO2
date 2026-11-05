@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Reportes | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','reportes')}"></header>
+<main>
+<h2>Costos y reportes</h2>
+<section class="panel"><h3>Compras recibidas por proveedor</h3>
+<p>Total comprado: <strong th:text="${#numbers.formatDecimal(totalComprado,1,2)}">0.00</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Proveedor</th><th>Compras</th><th>Monto</th></tr></thead><tbody>
+<tr th:each="p : ${proveedores}"><td th:text="${p.proveedor()}"></td><td th:text="${p.compras()}"></td><td th:text="${#numbers.formatDecimal(p.monto(),1,2)}"></td></tr></tbody></table></div>
+<p th:if="${#lists.isEmpty(proveedores)}" class="muted">Aún no hay compras recibidas.</p></section>
+<section class="panel"><h3>Costo estimado de materiales por variante</h3>
+<div class="table-wrap"><table><thead><tr><th>Producto</th><th>Talla</th><th>SKU</th><th>Precio venta</th><th>Costo materiales</th><th>Margen</th></tr></thead><tbody>
+<tr th:each="c : ${estimados}"><td th:text="${c.producto()}"></td><td th:text="${c.talla()}"></td><td th:text="${c.sku()}"></td>
+<td th:text="${#numbers.formatDecimal(c.precioVenta(),1,2)}"></td><td th:text="${#numbers.formatDecimal(c.costoMateriales(),1,2)}"></td><td th:text="${#numbers.formatDecimal(c.margen(),1,2)}"></td></tr></tbody></table></div></section>
+<section class="panel"><h3>Costo real de producción por línea de orden</h3>
+<div class="table-wrap"><table><thead><tr><th>Orden</th><th>Línea</th><th>Variante</th><th>Terminadas</th><th>Materiales</th><th>Mano de obra</th><th>Total</th></tr></thead><tbody>
+<tr th:each="c : ${reales}"><td th:text="${c.idOrden()}"></td><td th:text="${c.idOrdenDetalle()}"></td><td th:text="${c.idVariante()}"></td><td th:text="${c.cantidadTerminada()}"></td>
+<td th:text="${#numbers.formatDecimal(c.costoMateriales(),1,2)}"></td><td th:text="${#numbers.formatDecimal(c.costoManoObra(),1,2)}"></td><td th:text="${#numbers.formatDecimal(c.costoTotal(),1,2)}"></td></tr></tbody></table></div>
+<p th:if="${#lists.isEmpty(reales)}" class="muted">Aún no hay producción registrada.</p></section>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>

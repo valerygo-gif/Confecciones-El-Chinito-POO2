@@ -1,0 +1,15 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Compras | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('compras','compras')}"></header>
+<main>
+<h2>Compras</h2>
+<p class="alert" th:if="${error}" th:text="${error}"></p>
+<div class="actions"><a class="link-button" th:href="@{/compras/nueva}">Registrar compra</a></div>
+<section class="panel table-wrap"><table><thead><tr><th>N.º</th><th>Fecha</th><th>Proveedor</th><th>Documento</th><th>Total</th><th>Estado</th><th></th></tr></thead><tbody>
+<tr th:each="c : ${compras}"><td th:text="${c.id()}"></td><td th:text="${#temporals.format(c.fecha(),'dd/MM/yyyy HH:mm')}"></td>
+<td th:text="${c.proveedor()}"></td><td th:text="${c.nroDocumento()} ?: '-'"></td>
+<td th:text="${#numbers.formatDecimal(c.total(),1,2)}"></td><td th:text="${c.estado()}"></td>
+<td><a th:href="@{/compras/{id}(id=${c.id()})}">Ver detalle</a></td></tr></tbody></table>
+<p th:if="${#lists.isEmpty(compras)}" class="muted">Aún no hay compras registradas.</p></section>
+</main><footer>Confecciones El Chinito · Compras, costos y reportes</footer></body></html>
