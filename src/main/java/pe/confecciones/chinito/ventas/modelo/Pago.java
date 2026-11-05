@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "pago")
 public class Pago {
-    public enum Metodo { EFECTIVO, YAPE, PLIN, TRANSFERENCIA, DEPOSITO, TARJETA, OTRO }
-    public enum Estado { CONFIRMADO, ANULADO }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago")
@@ -21,14 +19,14 @@ public class Pago {
     private BigDecimal monto;
     @Enumerated(EnumType.STRING)
     @Column(name = "metodo", nullable = false)
-    private Metodo metodo;
+    private MetodoPago metodo;
     @Column(name = "cuenta_receptora", length = 100)
     private String cuentaReceptora;
     @Column(name = "referencia_operacion", length = 120)
     private String referenciaOperacion;
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private Estado estado = Estado.CONFIRMADO;
+    private EstadoPago estado = EstadoPago.CONFIRMADO;
     @Column(name = "observaciones")
     private String observaciones;
 
@@ -36,17 +34,17 @@ public class Pago {
     public Long getIdPedido() { return idPedido; }
     public LocalDateTime getFechaPago() { return fechaPago; }
     public BigDecimal getMonto() { return monto; }
-    public Metodo getMetodo() { return metodo; }
+    public MetodoPago getMetodo() { return metodo; }
     public String getCuentaReceptora() { return cuentaReceptora; }
     public String getReferenciaOperacion() { return referenciaOperacion; }
-    public Estado getEstado() { return estado; }
+    public EstadoPago getEstado() { return estado; }
     public String getObservaciones() { return observaciones; }
     public void setIdPedido(Long idPedido) { this.idPedido = idPedido; }
     public void setFechaPago(LocalDateTime f) { this.fechaPago = f; }
     public void setMonto(BigDecimal monto) { this.monto = monto; }
-    public void setMetodo(Metodo metodo) { this.metodo = metodo; }
+    public void setMetodo(MetodoPago metodo) { this.metodo = metodo; }
     public void setCuentaReceptora(String c) { this.cuentaReceptora = c; }
     public void setReferenciaOperacion(String r) { this.referenciaOperacion = r; }
-    public void setEstado(Estado estado) { this.estado = estado; }
+    public void setEstado(EstadoPago estado) { this.estado = estado; }
     public void setObservaciones(String o) { this.observaciones = o; }
 }
