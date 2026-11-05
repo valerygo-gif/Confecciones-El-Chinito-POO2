@@ -1,6 +1,6 @@
 package pe.confecciones.chinito.pedidos.api;
 
-import pe.confecciones.chinito.pedidos.dto.PedidoResponse;
+import pe.confecciones.chinito.pedidos.dto.*;
 import java.util.Optional;
 
 // Los otros módulos (ventas, compras) consultan pedidos solo a través de esta interfaz.
