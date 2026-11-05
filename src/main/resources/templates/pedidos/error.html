@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Error | El Chinito</title>
+<link rel="stylesheet" th:href="@{/css/app.css}"></head><body>
+<header th:replace="~{fragments/layout :: cabecera('pedidos','pedidos')}"></header>
+<main>
+<h2>No se encontró el registro</h2>
+<p class="alert" th:text="${mensaje}"></p>
+<div class="actions"><a class="link-button secondary" th:href="@{/pedidos}">Volver a pedidos</a></div>
+</main><footer>Confecciones El Chinito · Pedidos y producción</footer></body></html>
