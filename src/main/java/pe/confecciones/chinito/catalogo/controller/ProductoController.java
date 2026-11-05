@@ -202,4 +202,13 @@ public class ProductoController {
         model.addAttribute("categorias", maestros.categorias());
         model.addAttribute("danzas", maestros.danzas());
     }
+
+    // Un id inexistente en una pantalla de consulta/edición responde 404 con una página clara, no un 500.
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String noEncontrado(IllegalArgumentException e, Model model, jakarta.servlet.http.HttpServletResponse respuesta) {
+        boolean noExiste = e.getMessage() != null && e.getMessage().contains("no encontrad");
+        respuesta.setStatus(noExiste ? 404 : 400);
+        model.addAttribute("mensaje", e.getMessage());
+        return "catalogo/error";
+    }
 }
