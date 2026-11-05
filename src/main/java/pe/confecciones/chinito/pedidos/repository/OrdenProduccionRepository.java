@@ -1,7 +1,6 @@
 package pe.confecciones.chinito.pedidos.repository;
 
-import pe.confecciones.chinito.pedidos.modelo.EstadoOrden;
-import pe.confecciones.chinito.pedidos.modelo.OrdenProduccion;
+import pe.confecciones.chinito.pedidos.modelo.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

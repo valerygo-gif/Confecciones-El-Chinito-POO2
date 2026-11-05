@@ -1,8 +1,7 @@
 package pe.confecciones.chinito.pedidos.controller;
 
-import pe.confecciones.chinito.pedidos.dto.OrdenProduccionRequest;
-import pe.confecciones.chinito.pedidos.dto.OrdenProduccionResponse;
-import pe.confecciones.chinito.pedidos.modelo.EstadoOrden;
+import pe.confecciones.chinito.pedidos.dto.*;
+import pe.confecciones.chinito.pedidos.modelo.*;
 import pe.confecciones.chinito.pedidos.service.OrdenProduccionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +29,8 @@ public class OrdenProduccionController {
     }
 
     @PatchMapping("/{id}/estado")
-    public OrdenProduccionResponse cambiarEstado(@PathVariable Long id, @RequestParam EstadoOrden nuevo) {
+    public OrdenProduccionResponse cambiarEstado(@PathVariable Long id,
+                                                     @RequestParam EstadoOrden nuevo) {
         return servicio.cambiarEstado(id, nuevo);
     }
 }

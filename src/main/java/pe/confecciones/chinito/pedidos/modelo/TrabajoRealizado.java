@@ -9,27 +9,37 @@ import java.time.LocalDateTime;
 @Table(name = "trabajo_realizado")
 // Una actividad debe estar VALIDADA antes de entrar al cálculo de comisiones.
 public class TrabajoRealizado {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_trabajo")
     private Long id;
+
     @Column(name = "id_orden_detalle", nullable = false)
     private Long idOrdenDetalle;
+
     @Column(name = "id_trabajador", nullable = false)
     private Long idTrabajador;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "etapa", nullable = false)
     private EtapaProduccion etapa;
+
     @Column(name = "fecha_trabajo", nullable = false)
     private LocalDate fechaTrabajo;
+
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
+
     @Column(name = "tarifa_por_unidad", nullable = false, precision = 12, scale = 2)
     private BigDecimal tarifaPorUnidad;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     private EstadoTrabajo estado = EstadoTrabajo.REPORTADO;
+
     @Column(name = "fecha_validacion")
     private LocalDateTime fechaValidacion;
+
     @Column(name = "observaciones", length = 255)
     private String observaciones;
 
@@ -43,6 +53,7 @@ public class TrabajoRealizado {
     public EstadoTrabajo getEstado() { return estado; }
     public LocalDateTime getFechaValidacion() { return fechaValidacion; }
     public String getObservaciones() { return observaciones; }
+
     public void setIdOrdenDetalle(Long idOrdenDetalle) { this.idOrdenDetalle = idOrdenDetalle; }
     public void setIdTrabajador(Long idTrabajador) { this.idTrabajador = idTrabajador; }
     public void setEtapa(EtapaProduccion etapa) { this.etapa = etapa; }

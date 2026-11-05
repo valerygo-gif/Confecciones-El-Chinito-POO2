@@ -2,14 +2,17 @@ package pe.confecciones.chinito.ventas.service;
 
 import org.junit.jupiter.api.Test;
 import pe.confecciones.chinito.pedidos.api.PedidoConsulta;
-import pe.confecciones.chinito.pedidos.dto.PedidoDetalleResponse;
 import pe.confecciones.chinito.pedidos.dto.PedidoResponse;
 import pe.confecciones.chinito.pedidos.modelo.EstadoPedido;
-import pe.confecciones.chinito.pedidos.modelo.TipoItemPedido;
 import pe.confecciones.chinito.pedidos.modelo.TipoPedido;
-import pe.confecciones.chinito.ventas.modelo.Pago;
+import pe.confecciones.chinito.ventas.api.ClienteConsulta;
+import pe.confecciones.chinito.ventas.modelo.EstadoVenta;
 import pe.confecciones.chinito.ventas.modelo.Venta;
-import pe.confecciones.chinito.ventas.repository.*;
+import pe.confecciones.chinito.ventas.repository.VentaRepository;
+import pe.confecciones.chinito.ventas.service.excepcion.ReglaVentaException;
+import pe.confecciones.chinito.ventas.service.excepcion.VentaNoEncontradaException;
+import pe.confecciones.chinito.ventas.service.validador.VentaAnulableValidator;
+import pe.confecciones.chinito.ventas.service.validador.VentaRegistrableValidator;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,78 +24,81 @@ import static org.mockito.Mockito.*;
 
 class VentaServiceTest {
     private final VentaRepository ventas = mock(VentaRepository.class);
-    private final PagoRepository pagos = mock(PagoRepository.class);
-    private final EntregaRepository entregas = mock(EntregaRepository.class);
-        private final PedidoConsulta pedidos = mock(PedidoConsulta.class);
-    private final VentaService servicio = new VentaService(ventas, pagos, entregas, pedidos);
+    private final PedidoConsulta pedidos = mock(PedidoConsulta.class);
+    private final PagoService pagos = mock(PagoService.class);
+    private final VentaServiceImpl servicio = new VentaServiceImpl(ventas, pedidos, mock(ClienteConsulta.class),
+            pagos, mock(EntregaService.class), new VentaRegistrableValidator(ventas), new VentaAnulableValidator());
 
-    private void pedidoDe100() {
-        var detalle = new PedidoDetalleResponse(1L, TipoItemPedido.INDIVIDUAL, null, "Blusa", 2,
-                new BigDecimal("50.00"), null);
+    private void pedido(EstadoPedido estado) {
         when(pedidos.buscarPedido(1L)).thenReturn(Optional.of(new PedidoResponse(1L, 7L,
-                LocalDateTime.now(), null, TipoPedido.REGULAR, EstadoPedido.CONFIRMADO, null, List.of(detalle))));
+                LocalDateTime.now(), null, TipoPedido.REGULAR, estado, null, List.of())));
     }
 
     @Test
-    void saldoEsTotalMenosPagosConfirmados() {
-        pedidoDe100();
-        Pago ok = new Pago(); ok.setMonto(new BigDecimal("30.00"));
-        Pago anulado = new Pago(); anulado.setMonto(new BigDecimal("40.00")); anulado.setEstado(Pago.Estado.ANULADO);
-        when(pagos.findByIdPedidoOrderByFechaPagoDesc(1L)).thenReturn(List.of(ok, anulado));
-        assertEquals(0, new BigDecimal("100.00").compareTo(servicio.total(1L)));
-        assertEquals(0, new BigDecimal("30.00").compareTo(servicio.pagado(1L)));
-    }
-
-    @Test
-    void pagoMayorAlSaldoSeRechaza() {
-        pedidoDe100();
-        when(pagos.findByIdPedidoOrderByFechaPagoDesc(1L)).thenReturn(List.of());
-        ventaActiva();
-        Pago f = new Pago();
-        f.setMonto(new BigDecimal("150.00"));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
-        verify(pagos, never()).save(any());
+    void registraVentaDePedidoVigente() {
+        pedido(EstadoPedido.CONFIRMADO);
+        when(ventas.findByIdPedido(1L)).thenReturn(Optional.empty());
+        servicio.registrar(1L);
+        verify(ventas).save(any(Venta.class));
     }
 
     @Test
     void noSeVendeDosVecesElMismoPedido() {
-        pedidoDe100();
-        when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(new pe.confecciones.chinito.ventas.modelo.Venta()));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarVenta(1L));
-    }
-
-    private void ventaActiva() {
+        pedido(EstadoPedido.CONFIRMADO);
         when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(new Venta()));
+        assertThrows(ReglaVentaException.class, () -> servicio.registrar(1L));
+        verify(ventas, never()).save(any());
     }
 
     @Test
-    void pagoYEntregaExigenVentaRegistrada() {
-        pedidoDe100();
-        when(ventas.findByIdPedido(1L)).thenReturn(Optional.empty());
-        Pago f = new Pago(); f.setMonto(new BigDecimal("10.00"));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarEntrega(1L, null));
-        verify(pagos, never()).save(any());
-        verify(entregas, never()).save(any());
+    void noSeVendeUnPedidoCancelado() {
+        pedido(EstadoPedido.CANCELADO);
+        assertThrows(ReglaVentaException.class, () -> servicio.registrar(1L));
     }
 
     @Test
-    void pagoYEntregaRechazadosConVentaAnulada() {
-        pedidoDe100();
-        Venta v = new Venta(); v.setEstado(Venta.Estado.ANULADA);
-        when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(v));
-        Pago f = new Pago(); f.setMonto(new BigDecimal("10.00"));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarPago(1L, f));
-        assertThrows(IllegalArgumentException.class, () -> servicio.registrarEntrega(1L, null));
+    void noSeVendeUnPedidoInexistente() {
+        when(pedidos.buscarPedido(1L)).thenReturn(Optional.empty());
+        assertThrows(ReglaVentaException.class, () -> servicio.registrar(1L));
     }
 
     @Test
-    void pagoValidoConVentaActivaSeGuarda() {
-        pedidoDe100();
-        ventaActiva();
-        when(pagos.findByIdPedidoOrderByFechaPagoDesc(1L)).thenReturn(List.of());
-        Pago f = new Pago(); f.setMonto(new BigDecimal("40.00"));
-        servicio.registrarPago(1L, f);
-        verify(pagos).save(f);
+    void anularVentaSinPagosLaMarcaAnulada() {
+        Venta v = new Venta(); v.setIdPedido(1L);
+        when(ventas.findById(3L)).thenReturn(Optional.of(v));
+        when(pagos.pagado(1L)).thenReturn(BigDecimal.ZERO);
+        servicio.anular(3L);
+        assertEquals(EstadoVenta.ANULADA, v.getEstado());
+        verify(ventas).save(v);
+    }
+
+    @Test
+    void noSeAnulaUnaVentaConPagosConfirmados() {
+        Venta v = new Venta(); v.setIdPedido(1L);
+        when(ventas.findById(3L)).thenReturn(Optional.of(v));
+        when(pagos.pagado(1L)).thenReturn(new BigDecimal("30.00"));
+        assertThrows(ReglaVentaException.class, () -> servicio.anular(3L));
+        assertEquals(EstadoVenta.ACTIVA, v.getEstado());
+    }
+
+    @Test
+    void noSeAnulaDosVecesNiUnaVentaInexistente() {
+        Venta v = new Venta(); v.setIdPedido(1L); v.setEstado(EstadoVenta.ANULADA);
+        when(ventas.findById(3L)).thenReturn(Optional.of(v));
+        when(ventas.findById(9L)).thenReturn(Optional.empty());
+        when(pagos.pagado(1L)).thenReturn(BigDecimal.ZERO);
+        assertThrows(ReglaVentaException.class, () -> servicio.anular(3L));
+        assertThrows(VentaNoEncontradaException.class, () -> servicio.anular(9L));
+    }
+
+    @Test
+    void ventaActivaSoloSiExisteYNoEstaAnulada() {
+        Venta anulada = new Venta(); anulada.setEstado(EstadoVenta.ANULADA);
+        when(ventas.findByIdPedido(1L)).thenReturn(Optional.of(new Venta()));
+        when(ventas.findByIdPedido(2L)).thenReturn(Optional.of(anulada));
+        when(ventas.findByIdPedido(3L)).thenReturn(Optional.empty());
+        assertTrue(servicio.tieneVentaActiva(1L));
+        assertFalse(servicio.tieneVentaActiva(2L));
+        assertFalse(servicio.tieneVentaActiva(3L));
     }
 }

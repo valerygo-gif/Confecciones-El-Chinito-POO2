@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "cliente")
 public class Cliente {
-    public enum TipoDocumento { DNI, RUC, CE, OTRO }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cliente")

@@ -1,7 +1,7 @@
 package pe.confecciones.chinito.ventas.repository;
 
 import pe.confecciones.chinito.ventas.modelo.Cliente;
-import pe.confecciones.chinito.ventas.modelo.Cliente.TipoDocumento;
+import pe.confecciones.chinito.ventas.modelo.TipoDocumento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
